@@ -8,7 +8,7 @@ It's a theme for zsh. It was intended to be a slimmed down version of [steeef](h
 Features:
 * Absolutely no vcs support, to reduce clutter
 * Looks like a slightly more colourful standard Debian bash prompt
-* xterm/screen/tmux title handling with ```chpwd``` hook to be optimal
+* xterm/screen/tmux title handling with ```precmd``` hook
 
 ### Installation
 

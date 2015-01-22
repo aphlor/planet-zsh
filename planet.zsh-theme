@@ -41,7 +41,7 @@ function update_term_title {
 	esac
 }
 autoload add-zsh-hook
-add-zsh-hook chpwd update_term_title
+add-zsh-hook precmd update_term_title
 
 # run it now to avoid disappointment
 update_term_title
