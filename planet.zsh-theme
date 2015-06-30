@@ -29,14 +29,22 @@ case "$TERM" in
 		;;
 esac
 
+# if we are working in a chroot, set up some snippets to show the chroot
+_chroot_snippet=""
+_chroot_prompt_snippet=""
+[ ! -z "${SCHROOT_CHROOT_NAME}" ] && {
+	_chroot_snippet="[chroot: ${SCHROOT_CHROOT_NAME}] "
+	_chroot_prompt_snippet="%{$turquoise%}[%{$limegreen%}${SCHROOT_CHROOT_NAME}%{$turquoise%}]%{$reset_color%} "
+}
+
 # setup a hook to change the xterm/screen/tmux title on pwd change
 function update_term_title {
 	case "$TERM" in
 		xterm*|vte*|rxvt*)
-			printf "\033]0;%s@%s:%s\007" "${USER}" "${_prompt_hostname%%.*}" "${PWD/#$HOME/~}"
+			printf "\033]0;%s%s@%s:%s\007" "${_chroot_snippet}" "${USER}" "${_prompt_hostname%%.*}" "${PWD/#$HOME/~}"
 			;;
 		screen*)
-			printf "\033k%s@%s:%s\033\\" "${USER}" "${_prompt_hostname%%.*}" "${PWD/#$HOME/~}"
+			printf "\033k%s%s@%s:%s\033\\" "${_chroot_snippet}" "${USER}" "${_prompt_hostname%%.*}" "${PWD/#$HOME/~}"
 			;;
 	esac
 }
@@ -47,4 +55,4 @@ add-zsh-hook precmd update_term_title
 update_term_title
 
 # set the actual prompt
-PROMPT=$'%{$purple%}%n%{$reset_color%}@%{$orange%}%m%{$reset_color%}:%{$limegreen%}%~%{$reset_color%}%{$reset_color%}%# '
+PROMPT=$'${_chroot_prompt_snippet}%{$purple%}%n%{$reset_color%}@%{$orange%}%m%{$reset_color%}:%{$limegreen%}%~%{$reset_color%}%{$reset_color%}%# '
