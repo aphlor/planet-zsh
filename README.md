@@ -6,7 +6,8 @@ Planet theme for zsh
 It's a theme for zsh. It was intended to be a slimmed down version of [steeef](https://github.com/robbyrussell/oh-my-zsh/blob/master/themes/steeef.zsh-theme) from [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh/).
 
 Features:
-* Absolutely no vcs support, to reduce clutter
+* git branch in prompt, off by default for speed reasons, turn on with ```planet git on```
+* schroot name in prompt, on by default, turn off with ```planet chroot off```
 * Looks like a slightly more colourful standard Debian bash prompt
 * xterm/screen/tmux title handling with ```precmd``` hook
 
