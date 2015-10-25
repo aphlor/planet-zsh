@@ -44,8 +44,12 @@ __planetprompt_chroot_stub=""
 	__planetprompt_chroot_stub="%{$turquoise%}[%{$limegreen%}${SCHROOT_CHROOT_NAME}%{$turquoise%}]%{$reset_color%} "
 }
 
+# set this up so we don't hit an undefined env variable
+__planetprompt_git_prompt=""
+
 # setup a hook to change the xterm/screen/tmux title on pwd change
 function __planetprompt_update {
+	# xterm/screen titles
 	case "$TERM" in
 		xterm*|vte*|rxvt*)
 			printf "\033]0;%s%s@%s:%s\007" "${__planetprompt_chroot}" "${USER}" "${__planetprompt_hostname%%.*}" "${PWD/#$HOME/~}"
@@ -55,10 +59,27 @@ function __planetprompt_update {
 			;;
 	esac
 
-	if [  "$__planetprompt_opt_chroot" = "on" ]; then
+	# if chroot-in-prompt is enabled, set or unset the snippet
+	if [ "$__planetprompt_opt_chroot" = "on" ]; then
 		__planetprompt_chroot_prompt="$__planetprompt_chroot_stub"
 	else
 		__planetprompt_chroot_prompt=""
+	fi
+
+	# if git is enabled, incorporate into the prompt
+	if [ "$__planetprompt_opt_git" = "on" ]; then
+		local __git_dir="$(git rev-parse --git-dir 2>/dev/null)"
+		local __git_char_branch=$'\ue0a0'
+		if [ -n "$__git_dir" ]; then
+			# we have teh git
+			local __git_branch="$(git status --porcelain --branch 2>/dev/null | grep ^## | sed 's/^## \(.*\)\.\.\..*$/\1/')"
+			__planetprompt_git_prompt="%{$turquoise%}(%{$limegreen%}$__git_char_branch%{$purple%}$__git_branch%{$turquoise%})%{$reset_color%} "
+		else
+			# not in a git repo, clear the prompt
+			__planetprompt_git_prompt=""
+		fi
+	else
+		__planetprompt_git_prompt=""
 	fi
 }
 autoload add-zsh-hook
@@ -90,7 +111,11 @@ function planet {
 		git)
 			case "$2" in
 				on)
-					__planetprompt_opt_git="on"
+					if command -v git >/dev/null; then
+						__planetprompt_opt_git="on"
+					else
+						echo "Can't find 'git' executable. Won't enable git prompt stub." >&2
+					fi
 					;;
 				off)
 					__planetprompt_opt_git="off"
@@ -111,4 +136,4 @@ function planet {
 }
 
 # set the actual prompt
-PROMPT=$'${__planetprompt_chroot_prompt}%{$purple%}%n%{$reset_color%}@%{$orange%}%m%{$reset_color%}:%{$limegreen%}%~%{$reset_color%}%{$reset_color%}%# '
+PROMPT=$'${__planetprompt_chroot_prompt}${__planetprompt_git_prompt}%{$purple%}%n%{$reset_color%}@%{$orange%}%m%{$reset_color%}:%{$limegreen%}%~%{$reset_color%}%{$reset_color%}%# '
