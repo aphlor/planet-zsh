@@ -11,8 +11,8 @@ autoload colors
 colors
 
 # some globals for options
-__planetprompt_opt_git="no"
-__planetprompt_opt_chroot="yes"
+__planetprompt_opt_git="off"
+__planetprompt_opt_chroot="on"
 
 # grab the hostname once during startup (seriously, who changes their hostname that often?)
 __planetprompt_hostname="$(hostname -s)"
@@ -38,9 +38,10 @@ esac
 # if we are working in a chroot, set up some snippets to show the chroot
 __planetprompt_chroot=""
 __planetprompt_chroot_prompt=""
+__planetprompt_chroot_stub=""
 [ ! -z "${SCHROOT_CHROOT_NAME}" ] && {
-	__planetprompt_chroot="[chroot: ${SCHROOT_CHROOT_NAME}] "
-	__planetprompt_chroot_prompt="%{$turquoise%}[%{$limegreen%}${SCHROOT_CHROOT_NAME}%{$turquoise%}]%{$reset_color%} "
+	__planetprompt_chroot="[${SCHROOT_CHROOT_NAME}] "
+	__planetprompt_chroot_stub="%{$turquoise%}[%{$limegreen%}${SCHROOT_CHROOT_NAME}%{$turquoise%}]%{$reset_color%} "
 }
 
 # setup a hook to change the xterm/screen/tmux title on pwd change
@@ -53,6 +54,12 @@ function __planetprompt_update {
 			printf "\033k%s%s@%s:%s\033\\" "${__planetprompt_chroot}" "${USER}" "${__planetprompt_hostname%%.*}" "${PWD/#$HOME/~}"
 			;;
 	esac
+
+	if [  "$__planetprompt_opt_chroot" = "on" ]; then
+		__planetprompt_chroot_prompt="$__planetprompt_chroot_stub"
+	else
+		__planetprompt_chroot_prompt=""
+	fi
 }
 autoload add-zsh-hook
 add-zsh-hook precmd __planetprompt_update
