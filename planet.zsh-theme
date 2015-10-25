@@ -11,8 +11,8 @@ autoload colors
 colors
 
 # some globals for options
-__planetprompt_opt_git="off"
-__planetprompt_opt_chroot="on"
+__planetprompt_opt_git="${__planetprompt_opt_git:-off}"
+__planetprompt_opt_chroot="${__planetprompt_opt_chroot:-on}"
 
 # grab the hostname once during startup (seriously, who changes their hostname that often?)
 __planetprompt_hostname="$(hostname -s)"
