@@ -72,7 +72,7 @@ function __planetprompt_update {
 		local __git_char_branch=$'\ue0a0'
 		if [ -n "$__git_dir" ]; then
 			# we have teh git
-			local __git_branch="$(git status --porcelain --branch 2>/dev/null | grep ^## | sed 's/^## \(.*\)\.\.\..*$/\1/')"
+			local __git_branch="$(git symbolic-ref --short HEAD 2>/dev/null)"
 			__planetprompt_git_prompt="%{$turquoise%}(%{$limegreen%}$__git_char_branch%{$purple%}$__git_branch%{$turquoise%})%{$reset_color%} "
 		else
 			# not in a git repo, clear the prompt
