@@ -13,6 +13,7 @@ colors
 # some globals for options
 __planetprompt_opt_git="${__planetprompt_opt_git:-off}"
 __planetprompt_opt_chroot="${__planetprompt_opt_chroot:-on}"
+__planetprompt_opt_shade="${__planetprompt_opt_shade:-dark}"
 
 # grab the hostname once during startup (seriously, who changes their hostname that often?)
 __planetprompt_hostname="$(hostname -s)"
@@ -20,13 +21,21 @@ __planetprompt_hostname="$(hostname -s)"
 # use extended color pallete if available
 case "$TERM" in
 	*-256color)
+		# fancy shmancy 256-colour palette
 		turquoise="%F{81}"
 		orange="%F{166}"
 		purple="%F{135}"
 		hotpink="%F{161}"
 		limegreen="%F{118}"
+
+		[ "$__planetprompt_opt_shade" = "light" ] && {
+			# override some colours in the light variant
+			turquoise="%F{69}"
+			limegreen="%F{106}"
+		}
 		;;
 	*)
+		# standard 16-colour palette
 		turquoise="$fg[cyan]"
 		orange="$fg[yellow]"
 		purple="$fg[magenta]"
