@@ -58,6 +58,11 @@ __planetprompt_git_prompt=""
 
 # setup a hook to change the xterm/screen/tmux title on pwd change
 function __planetprompt_update {
+	# these are the symbols we use in the prompt to indicate git "things"
+	local __git_char_branch=$'\ue0a0'
+	local __git_char_tag=$'\u2302'
+	local __git_char_ref=$'\u25cc'
+
 	# xterm/screen titles
 	case "$TERM" in
 		xterm*|vte*|rxvt*)
@@ -78,11 +83,24 @@ function __planetprompt_update {
 	# if git is enabled, incorporate into the prompt
 	if [ "$__planetprompt_opt_git" = "on" ]; then
 		local __git_dir="$(git rev-parse --git-dir 2>/dev/null)"
-		local __git_char_branch=$'\ue0a0'
 		if [ -n "$__git_dir" ]; then
 			# we have teh git
-			local __git_branch="$(git symbolic-ref --short HEAD 2>/dev/null)"
-			__planetprompt_git_prompt="%{$turquoise%}(%{$limegreen%}$__git_char_branch%{$purple%}$__git_branch%{$turquoise%})%{$reset_color%} "
+			local __git_meta="$(git symbolic-ref --short HEAD 2>/dev/null)"
+			local __git_char="$__git_char_branch"
+
+			if [ -z "$__git_meta" ]; then
+				# the "branch" is empty, this might be a tag. let's find out.
+				__git_meta="$(git describe --tags --exact-match 2>/dev/null)"
+				__git_char="$__git_char_tag"
+			fi
+
+			if [ -z "$__git_meta" ]; then
+				# ok, best guess time. it's not a branch, not a tag, this is likely a detached ref.
+				__git_meta="$(git rev-parse --short HEAD 2>/dev/null)"
+				__git_char="$__git_char_ref"
+			fi
+
+			__planetprompt_git_prompt="%{$turquoise%}(%{$limegreen%}$__git_char%{$purple%}$__git_meta%{$turquoise%})%{$reset_color%} "
 		else
 			# not in a git repo, clear the prompt
 			__planetprompt_git_prompt=""
