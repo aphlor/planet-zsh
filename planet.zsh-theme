@@ -59,9 +59,17 @@ __planetprompt_git_prompt=""
 # setup a hook to change the xterm/screen/tmux title on pwd change
 function __planetprompt_update {
 	# these are the symbols we use in the prompt to indicate git "things"
-	local __git_char_branch=$'\ue0a0'
-	local __git_char_tag=$'\u2302'
-	local __git_char_ref=$'\u25cc'
+	if [[ -o multibyte ]]; then
+		# use rich utf-8 characters
+		local __git_char_branch=$'\ue0a0'
+		local __git_char_tag=$'\u2302'
+		local __git_char_ref=$'\u25cc'
+	else
+		# use fallback latin-1
+		local __git_char_branch=$':'
+		local __git_char_tag=$'@'
+		local __git_char_ref=$'>'
+	fi
 
 	# xterm/screen titles
 	case "$TERM" in
